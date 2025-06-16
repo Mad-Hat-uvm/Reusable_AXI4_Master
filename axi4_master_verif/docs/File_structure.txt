@@ -1,0 +1,41 @@
+axi4_master_verif/
+├── rtl/                        # DUT RTL (if you integrate with a design team)
+│   └── axi4_slave_regfile.sv
+│
+├── tb/                         # Top-level testbench
+│   ├── top_tb.sv               # Instantiates DUT + env
+│   ├── Makefile                # Build & regression targets
+│   └── regression.py           # Python script driving multiple tests
+│
+├── iface/                      # Interface definitions
+│   └── axi4_if.sv              # modport, clock/reset
+│
+├── env/                        # UVM environment
+│   ├── axi4_env.sv             # Environment wrapper (agent + scoreboard)
+│   ├── agent/                  # AXI4 master agent
+│   │   ├── axi4_agent.sv
+│   │   ├── axi4_driver.sv
+│   │   ├── axi4_sequencer.sv
+│   │   ├── axi4_monitor.sv
+│   │   └── axi4_txn.sv         # Transaction & sequence_item
+│   ├── scoreboard/             # Data integrity checker
+│   │   └── axi4_scoreboard.sv
+│   └── coverage/               # Coverage definitions
+│       └── axi4_cov.sv
+│
+├── seq/                        # Sequences
+│   ├── single_beat_seq.sv
+│   ├── burst_seq.sv
+│   └── error_seq.sv
+│
+├── tests/                      # Testcases
+│   ├── tc1_single_beat.sv
+│   ├── tc2_burst.v
+│   └── tc*_*.sv                # others...
+│
+├── docs/                       # Documentation & test plan
+│   └── AXI4_Verif_TestPlan.md
+│
+└── cov_reports/                # Coverage & waveform dumps
+    ├── coverage.ucdb
+    └── wave.do
