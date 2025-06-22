@@ -13,7 +13,7 @@ interface axi_if #(parameter ADDR_WIDTH = 32, DATA_WIDTH = 32, parameter ID_WIDT
 //Write Address Channel
 //---------------------------------------------------------
 logic [ADDR_WIDTH-1 : 0] AWADDR;    //Write address
-logic                    AWLEN;     //Burst length: #beats = AWLEN + 1
+logic [7:0]              AWLEN;     //Burst length: #beats = AWLEN + 1
 logic [1:0]              AWBURST;   //Burst type: 00=FIXED, 01=INCR, 10=WRAP
 logic [ID_WIDTH-1 : 0]   AWID;      //Transaction ID                  
 logic                    AWVALID;   //Write address valid
