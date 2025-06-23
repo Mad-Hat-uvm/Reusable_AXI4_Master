@@ -1,8 +1,8 @@
 //----------------------------------------------------------------
 // axi4_driver.sv
-// UVM Driver for AXI4 master agent
-// - Drives AW/W/B or AR/R handshakes per transaction
-// - Adopt clocking block for clean #1step timing
+//  • Drives AW/W/B for writes and AR/R for reads via clocking block
+//  • Respects burst, ID, strobe, and last-beat semantics
+//  • Uses nonblocking waits for cycle-accurate handshakes
 //----------------------------------------------------------------
 `ifndef AXI4_DRIVER_SV
 `define AXI4_DRIVER_SV
@@ -61,7 +61,7 @@ class axi4_driver extends uvm_driver #(axi4_txn);
 
         //Drive AW channel
         vif.master_cb.AWADDR  <= tr.addr;
-        vif.master_cb.AWLEN   <= tr.awlen;
+        vif.master_cb.AWLEN   <= tr.len;
         vif.master_cb.AWBURST <= tr.burst;
         vif.master_cb.AWID    <= tr.id;
         vif.master_cb.AWVALID <= 1;
@@ -75,7 +75,7 @@ class axi4_driver extends uvm_driver #(axi4_txn);
         vif.master_cb.WLAST   <= (beat == tr.len);
         vif.master_cb.WVALID  <= 1;
         wait (vif.master_cb.WREADY);
-        vif.WVALID  <= 0;
+        vif.master_cb.WVALID  <= 0;
         end
 
         //Accept B response
