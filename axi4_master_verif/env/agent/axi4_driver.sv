@@ -2,7 +2,7 @@
 // axi4_driver.sv
 // UVM Driver for AXI4 master agent
 // - Drives AW/W/B or AR/R handshakes per transaction
-// - Uses clocking block for clean #1step timing
+// - Adopt clocking block for clean #1step timing
 //----------------------------------------------------------------
 `ifndef AXI4_DRIVER_SV
 `define AXI4_DRIVER_SV
