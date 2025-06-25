@@ -13,6 +13,8 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
+import axi4_pkg::*;
+
 class axi4_monitor extends uvm_monitor;
  `uvm_component_utils(axi4_monitor)
 
