@@ -2,8 +2,10 @@ axi4_master_verif/
 ├── rtl/                        # DUT RTL (if you integrate with a design team)
 │   └── axi4_slave_regfile.sv
 │
-├── tb/                         # Top-level testbench
-│   ├── top_tb.sv               # Instantiates DUT + env
+├── tb/ 
+├── ├── uvm_lib/               ← common packages live here
+│   │   └── axi4_pkg.sv        ← your axi4_pkg goes here                        
+│   ├── top_tb.sv               # Instantiates DUT + env     # Top-level testbench
 │   ├── Makefile                # Build & regression targets
 │   └── regression.py           # Python script driving multiple tests
 │
