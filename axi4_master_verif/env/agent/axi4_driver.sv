@@ -10,6 +10,8 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
+import axi4_pkg::*;
+
 class axi4_driver extends uvm_driver #(axi4_txn);
     `uvm_component_utils(axi4_driver)
 
