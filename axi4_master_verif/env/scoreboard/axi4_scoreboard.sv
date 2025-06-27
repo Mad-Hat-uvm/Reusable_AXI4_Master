@@ -27,12 +27,34 @@ class axi4_scoreboard extends uvm_component;
    mem_t ref_mem;  //associative array indexed by address
 
 //---------------------------------------------------------
+//Internal field for coverage sampling
+//---------------------------------------------------------
+   bit [1:0] cv_bresp;
+   bit [1:0] cv_rresp;
+
+//---------------------------------------------------------
 //Optional coverage for response codes (BRESP, RRESP)
 //---------------------------------------------------------
    covergroup resp_cg @(posedge clk);
     option.per_instance = 1;
-    bresp_cp : coverpoint 
+    bresp_cp : coverpoint cv_bresp {
+        bins OKAY     = {2'b00};
+        bins EXOKAY   = {2'b01};
+        bins SLVERR   = {2'b10};
+        bins DECERR   = {2'B11};
+    }
+
+    rresp_cg : coverpoint cv_rresp {
+        bins OKAY     = {2'b00};
+        bins EXOKAY   = {2'bo1};
+        bins SLVERR   = {2'b10};
+        bins DECERR   = {2'b11};
+    }
    endgroup
+   resp_cg cg;
+
+   //Clock handle for coverage sampling
+   virtual logic clk;
 
 //---------------------------------------------------------
 //Constructor
@@ -44,38 +66,50 @@ class axi4_scoreboard extends uvm_component;
        
     endfunction
 
-    //Called when write monitor sends a transaction
-    function void write(input axi_transaction tr);
-        if(tr.txn_type == axi_transaction::AXI_WRITE) begin
-            ref_mem[tr.addr] = tr.data;
-            `uvm_info("AXI_SB_WRITE", $sformatf("Logged WRITE addr=0x%0h data=0x%0h", tr.addr, tr.data), UVM_MEDIUM)
-        end 
-        else begin
-            `uvm_error("AXI_SB_WRITE", "Received non_write transaction on write export");
-            
-        end
+//---------------------------------------------------------
+//build_phase: grab clock for covergroup
+//---------------------------------------------------------
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        if(!uvm_config_db#(virtual logic)::get(this, "", "clk", clk))
+          `uvm_fatal("NOCLOCK", "axi4_scoreboard: clock not found in config DB");
+        cg = new(this);  //instantiate per instance
     endfunction
 
-     //Called when read monitor sends a transaction
-    function void read(input axi_transaction tr);
-        bit [31:0] expected;
+//---------------------------------------------------------
+//run_phase: consume and check forever
+//---------------------------------------------------------
+    task run_phase(uvm_phase phase);
+        axi4_txn txn;
+        forever begin
+            //1) Get next transaction
+            analysis_export.get(txn);
 
-        if(tr.txn_type == axi_transaction::AXI_READ) begin
-          if(ref_mem.exists(tr.addr)) begin
-            expected = ref_mem[tr.addr];
-            if(expected != tr.data)
-            `uvm_error("AXI_SB_READ", $sformatf("Read MISMATCH at 0x0%h: expected: 0x0%h actual=0x0%h", tr.addr, expected, tr.data))
-            else
-            `uvm_info("AXI_SB_READ", $sformatf("Read MATCH at 0x%0h: data=0x%0h", tr.addr, tr.data), UVM_MEDIUM)
-          end 
-          else begin
-            `uvm_warning("AXI_SB_READ", $sformatf("Read from UNWRITTEN addr=0x%0h", tr.addr));
-          end
+            if(txn.txn_type -- TXN_WRITE) begin
+                //2a)Write: update the golden model
+                ref_mem[txn.addr] = txn.data;
+
+                //3a) Coverage on BRESP if provided
+                if(txn.has_bresp) begin
+                    cv_bresp = txn.bresp;
+                    cg.bresp_cp.sample();
+                end
+            end
+            else begin
+                //2b) Read: compare against golden model
+                data_t expected = ref_mem.exists[txn.addr] ? ref_mem[txn.addr] : `0;
+
+                if(expected !== txn.data) begin
+                    `uvm_error("AXI_SCB", $sformatf("Read mismatch @0x%0h: exp=0x%0h got=0x%0h", txn.addr, expected, txn.data));
+                end
+                //3b) Coverage on RRESP if provided
+                if(txn.has_rresp) begin
+                    cv_rresp = txn.rresp;
+                    cg.rresp_cp.sample();
+                end
+            end
         end
-        else begin
-            `uvm_error("AXI_SB_READ", "Received non_write transaction on write export");
-        end
-    endfunction
+    endtask
 
 
-endclass
+    
