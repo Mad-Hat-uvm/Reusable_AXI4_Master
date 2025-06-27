@@ -13,7 +13,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-import axi4_pkg::*;
+import axi4_pkg::*;   //for axi4_txn, addr_t, data_t, etc.
 
 class axi4_monitor extends uvm_monitor;
  `uvm_component_utils(axi4_monitor)
@@ -86,17 +86,16 @@ task monitor_write_channel();
         tr.last  = vif.master_cb.WLAST;
         wait (!vif.master_cb.WVALID);
         end
-        //Sample coverage and publish
-        tr.cg.sample();
-        mon_ap.write(tr);
 
-        //Capture B response
-         if (vif.master_cb.BVALID && vif.master_cb.BREADY);
-        tr.resp = vif.master_cb.BRESP;
+        //Capture BRESP on B-channel handshake
+        @(vif.master_cb.ACLK);
+         wait (vif.master_cb.BVALID && vif.master_cb.BREADY);
+         tr.has_bresp = 1;
+         tr.bresp      = vif.master_cb.BRESP;
 
         `uvm_info("AXI_MON_WRITE", $sformatf("Sample write: %s",tr.convert2string()), UVM_MEDIUM)
 
-        //Send transaction to scoreboard
+        //Send the completed transaction exactly once
         mon_ap.write(tr);
         
     end
@@ -131,11 +130,14 @@ task monitor_read_channel();
         wait(!vif.master_cb.RVALID);
         end
 
-        //Sample coverage and publish
-        tr.cg.sample();
-        mon_ap.write(tr);
+        //Capture RRESP (read- response)
+        tr.has_rresp = 1;
+        tr.rresp     = vif.master_cb.RRESP;
 
         `uvm_info("AXI_MON_READ", $sformatf("Sample read: %s",tr.convert2string()), UVM_MEDIUM)
+
+        //Send the completed transaction exactly once
+        mon_ap.write(tr);
         
         end
         

@@ -51,11 +51,20 @@ class axi4_txn extends uvm_sequence_item;
 //-------------------------------------------------------------
 rand addr_t     addr;         //Base address
 rand data_t     data;         //Write data(ignore on read)
-rand byte       len;          //Burst length = len+1 beats
+rand int        len;          //Burst length = len+1 beats
 rand burst_t    burst;        //Burst type
 rand id_t       id;           //Transaction ID
 rand strb_t     strb;         //Byte-enable mask
+bit             last;         //assert on final beat
 rand txn_type_t txn_type;     //READ or WRITE
+
+//-------------------------------------------------------------
+// Response Fields
+//-------------------------------------------------------------
+bit             has_bresp;    //Set when BRESP seen
+bit [1:0]       bresp;        //captured bresp code
+bit             has_rresp;    //Set when RRESP seen
+bit [1:0]       rresp;        //captured rresp code
 
 //-------------------------------------------------------------
 // Coverage
