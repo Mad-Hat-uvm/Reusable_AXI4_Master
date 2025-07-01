@@ -14,10 +14,10 @@ class axi4_base_test extends uvm_test;
     `uvm_component_utils(axi4_base_test)
 
 //----------------------------------------------------------------------------   
-//Environment Instantiation
+//Environment Instantiation + sequence handle
 //----------------------------------------------------------------------------
     axi4_env env;
-
+    axi4_base_sequence seq;
 //----------------------------------------------------------------------------   
 //Constructor
 //----------------------------------------------------------------------------
@@ -30,27 +30,29 @@ class axi4_base_test extends uvm_test;
 //----------------------------------------------------------------------------
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-
+       
+        //1) env setup
         env = axi4_env::type_id::create("env", this);
 
-        //Bind your DUT virtual interface to the agent
+        //2) create the sequence here
+        seq = axi4_base_sequence::type_id::create("seq");
+        //tests will override seq.addr, seq.num_beats, etc. before run_phase
+
+        //3) Bind your DUT virtual interface to the agent
         uvm_config_db#(virtual axi4_if.MASTER)::set(null, "env.agent", "vif", dut_if);
 
-        //3) (Optional) Switch agent into passive only mode
+        // (Optional) Switch agent into passive only mode
         //uvm_config_db#(bit)::set(this, "env.agent", "is_active", 0);
         
     endfunction
 
 //----------------------------------------------------------------------------   
-//Build Phase: instantiate env and bund the DUT interface
+//Run Phase
 //----------------------------------------------------------------------------
     task run_phase(uvm_phase phase);
-        axi4_base_sequence seq;
+       
 
         phase.raise_objection(this);
-
-         //Create and start the sequence on write agents's sequencer
-          seq = axi4_base_sequence::type_id::create("seq");
 
          //Test controlled randomization of all needed fields
 
