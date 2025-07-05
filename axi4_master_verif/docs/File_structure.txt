@@ -1,43 +1,64 @@
 axi4_master_verif/
-├── rtl/                        # DUT RTL (if you integrate with a design team)
-│   └── axi4_slave_regfile.sv
+├── rtl/                                
+│   └── axi4_slave_regfile.sv           # DUT RTL
 │
-├── tb/ 
-├── ├── uvm_lib/               ← common packages live here
-│   │   └── axi4_pkg.sv        ← your axi4_pkg goes here                        
-│   ├── top_tb.sv               # Instantiates DUT + env     # Top-level testbench
-│   ├── Makefile                # Build & regression targets
-│   └── regression.py           # Python script driving multiple tests
+├── iface/                              # Interface definitions
+│   └── axi4_if.sv                      # clock/reset, modports, clocking block
 │
-├── iface/                      # Interface definitions
-│   └── axi4_if.sv              # modport, clock/reset
+├── tb/                                 # Testbench top‐level & library
+│   ├── uvm_lib/                        
+│   │   └── axi4_pkg.sv                 # common typedefs, parameters, enums
+│   │
+│   ├── top_tb.sv                       # Instantiates DUT, `dut_if`, and kicks off UVM
+│   ├── Makefile                        # Compile & regression targets (smoke/basic/full)
+│   └── regression.py                   # Python driver for running all tiers
 │
-├── env/                        # UVM environment
-│   ├── axi4_env.sv             # Environment wrapper (agent + scoreboard)
-│   ├── agent/                  # AXI4 master agent
+├── env/                                # Reusable UVM environment
+│   ├── axi4_env.sv                     # top‐level env (agent + scoreboard + coverage)
+│   ├── agent/                          # AXI4 master agent components
 │   │   ├── axi4_agent.sv
 │   │   ├── axi4_driver.sv
 │   │   ├── axi4_sequencer.sv
 │   │   ├── axi4_monitor.sv
-│   │   └── axi4_txn.sv         # Transaction & sequence_item
-│   ├── scoreboard/             # Data integrity checker
+│   │   └── axi4_txn.sv                 # transaction class (payload/item)
+│   │
+│   ├── scoreboard/                     
 │   │   └── axi4_scoreboard.sv
-│   └── coverage/               # Coverage definitions
+│   │
+│   └── coverage/                       
 │       └── axi4_cov.sv
 │
-├── seq/                        # Sequences
-│   ├── single_beat_seq.sv
-│   ├── burst_seq.sv
-│   └── error_seq.sv
+├── seq/                                # Sequence library
+│   ├── axi4_base_sequence.sv           # write ± optional read
+│   ├── axi4_read_only_sequence.sv      # pure read bursts
+│   ├── axi4_rand_sequence.sv           # randomized variant
+│   ├── single_beat_seq.sv              # alias / example wrappers
+│   ├── burst_seq.sv                    
+│   └── error_seq.sv                    
 │
-├── tests/                      # Testcases
-│   ├── tc1_single_beat.sv
-│   ├── tc2_burst.v
-│   └── tc*_*.sv                # others...
+├── tests/                              # UVM testcases, by regression tier
+│   ├── axi4_base_test.sv               # base test (instantiates `seq` in build_phase)
+│   │
+│   ├── smoke/                          
+│   │   ├── axi4_smoke_wr_rd_test.sv
+│   │   ├── axi4_smoke_wr_only_test.sv
+│   │   └── axi4_smoke_rd_only_test.sv
+│   │
+│   ├── basic/                          
+│   │   ├── axi4_basic_wr_rd_test.sv
+│   │   ├── axi4_basic_random_test.sv
+│   │   └── axi4_basic_unaligned_test.sv
+│   │
+│   ├── stress/                         
+│   │   ├── axi4_stress_burst_test.sv
+│   │   └── axi4_negative_error_test.sv
+│   │
+│   └── system/                         
+│       └── axi4_interconnect_test.sv
 │
-├── docs/                       # Documentation & test plan
+├── docs/                               # Design & testplan documentation
 │   └── AXI4_Verif_TestPlan.md
 │
-└── cov_reports/                # Coverage & waveform dumps
+└── cov_reports/                        # Coverage databases & waveform scripts
     ├── coverage.ucdb
     └── wave.do
