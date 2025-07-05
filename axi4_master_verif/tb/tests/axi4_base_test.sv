@@ -17,7 +17,7 @@ class axi4_base_test extends uvm_test;
 //Environment Instantiation + sequence handle
 //----------------------------------------------------------------------------
     axi4_env env;
-    axi4_base_sequence seq;
+    uvm_sequence_base seq;     //generic base handle
 //----------------------------------------------------------------------------   
 //Constructor
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class axi4_base_test extends uvm_test;
         //1) env setup
         env = axi4_env::type_id::create("env", this);
 
-        //2) create the sequence here
+        //2) create the default sequence here
         seq = axi4_base_sequence::type_id::create("seq");
         //tests will override seq.addr, seq.num_beats, etc. before run_phase
 
