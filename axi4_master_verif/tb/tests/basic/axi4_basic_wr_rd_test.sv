@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// axi4_basic_wr_rd_test.sv - Smoke Test: single beat write + read
+// axi4_basic_wr_rd_test.sv - Basic Regression Test: multi-beat write + read-back
 //-----------------------------------------------------------------------------
 
 `ifndef AXI4_BASIC_WR_RD_TEST_SV
