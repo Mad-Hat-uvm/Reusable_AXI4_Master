@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// axi4_basic_random_test.sv - Smoke Test: single beat write + read
+// axi4_basic_random_test.sv - Basic regression test: Randomized bursts
 //-----------------------------------------------------------------------------
 
 `ifndef AXI4_BASIC_RANDOM_TEST_SV
