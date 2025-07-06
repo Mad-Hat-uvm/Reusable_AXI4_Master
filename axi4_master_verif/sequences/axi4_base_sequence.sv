@@ -52,7 +52,7 @@ class axi4_base_sequence extends uvm_sequence #(axi4_txn);
             start_item(rd);
             finish_item(rd);
             end
-        endtas
+        endtask
         
     
 endclass
