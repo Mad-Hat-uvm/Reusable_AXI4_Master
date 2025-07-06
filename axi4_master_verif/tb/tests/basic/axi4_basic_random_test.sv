@@ -42,7 +42,7 @@ class axi4_basic_random_test extends axi4_base_test;
         end   
 
         `uvm_info(get_type_name(), $sformatf("Starting random transaction:%0d beats=%0d addr 0x%0h", 
-                i, seq.num_beats, seq.addr), UVM_MEDIUM)
+                i, seq.num_beats, seq.addr), UVM_LOW)
 
         super.run_phase(phase);
         end
