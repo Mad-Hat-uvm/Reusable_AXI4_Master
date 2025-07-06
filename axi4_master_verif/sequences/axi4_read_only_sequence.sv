@@ -10,14 +10,14 @@ import uvm_pkg::*;
 
 import axi4_pkg::*;
 
-class axi4_base_sequence extends uvm_sequence #(axi4_txn);
-    `uvm_object_utils(axi4_base_sequence)
+class axi4_read_only_sequence extends axi4_base_sequence;
+    `uvm_object_utils(axi4_read_only_sequence)
 
     rand bit [ADDR_WIDTH-1 : 0] addr;             //start address
     rand int unsigned           num_beats = 1;    //burst length (1 - 16)
 
     //Constructor
-    function new(string name = "axi4_base_sequence");
+    function new(string name = "axi4_read_only_sequence");
         super.new(name);
     endfunction
 
