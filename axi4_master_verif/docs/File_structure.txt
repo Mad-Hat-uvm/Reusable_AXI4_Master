@@ -1,20 +1,21 @@
-axi4_master_verif/
+axi4_master_verif/                   <-- project root
 ├── rtl/                                
 │   └── axi4_slave_regfile.sv           # DUT RTL
 │
 ├── iface/                              # Interface definitions
 │   └── axi4_if.sv                      # clock/reset, modports, clocking block
 │
-├── tb/                                 # Testbench top‐level & library
+├── tb/                                 # Testbench harness & shared libraries
 │   ├── uvm_lib/                        
 │   │   └── axi4_pkg.sv                 # common typedefs, parameters, enums
 │   │
 │   ├── top_tb.sv                       # Instantiates DUT, `dut_if`, and kicks off UVM
-│   ├── Makefile                        # Compile & regression targets (smoke/basic/full)
-│   └── regression.py                   # Python driver for running all tiers
+│   ├── Makefile                        # compile targets & regression scripts
+│   └── regression.py                   # Python driver for smoke/basic/stress/system
 │
 ├── env/                                # Reusable UVM environment
 │   ├── axi4_env.sv                     # top‐level env (agent + scoreboard + coverage)
+│   │
 │   ├── agent/                          # AXI4 master agent components
 │   │   ├── axi4_agent.sv
 │   │   ├── axi4_driver.sv
@@ -25,14 +26,20 @@ axi4_master_verif/
 │   ├── scoreboard/                     
 │   │   └── axi4_scoreboard.sv
 │   │
-│   └── coverage/                       
-│       └── axi4_cov.sv
+│   ├── coverage/                       
+│   │   └── axi4_cov.sv
+│   │
+│   ├── virtual/                        # New for system-level
+│   │   ├── axi4_virtual_sequencer.sv   # virtual sequencer
+│   │   └── axi4_interconnect_virtual_seq.sv  # virtual sequence
 │
 ├── seq/                                # Sequence library
 │   ├── axi4_base_sequence.sv           # write ± optional read
 │   ├── axi4_read_only_sequence.sv      # pure read bursts
 │   ├── axi4_rand_sequence.sv           # randomized variant
-│   ├── single_beat_seq.sv              # alias / example wrappers
+│   ├── axi4_unaligned_sequence.sv      # for unaligned/partial‐strobe tests
+│   ├── axi4_error_sequence.sv          # for negative‐error tests
+│   ├── single_beat_seq.sv              
 │   ├── burst_seq.sv                    
 │   └── error_seq.sv                    
 │
@@ -54,9 +61,9 @@ axi4_master_verif/
 │   │   └── axi4_negative_error_test.sv
 │   │
 │   └── system/                         
-│       └── axi4_interconnect_test.sv
+│       └── axi4_interconnect_test.sv   # now starts virtual sequence on virtual sequencer
 │
-├── docs/                               # Design & testplan documentation
+├── docs/                               # Documentation & test plans
 │   └── AXI4_Verif_TestPlan.md
 │
 └── cov_reports/                        # Coverage databases & waveform scripts
