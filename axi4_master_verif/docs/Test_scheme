@@ -1,0 +1,9 @@
+| Tier                     | Scope                                                                | “Level”                    |
+| ------------------------ | -------------------------------------------------------------------- | -------------------------- |
+| **Smoke**                | One-beat write/read, write-only, read-only                           | Block-level (sanity)       |
+| **Basic**                | 1–16-beat bursts, random bursts, unaligned/partial-strobe            | Block-level (functional)   |
+| **Stress & Corner-Case** | Very long bursts, back-to-back traffic, error injections             | Block-level (robustness)   |
+| **System-Level**         | Two (or more) agents via virtual sequencer, interconnect arbitration | System-level (integration) |
+
+– Smoke/Basic/Stress all live in tb/tests/{smoke,basic,stress} and drive a single agent + DUT.
+– Only System-Level lives in tb/tests/system and uses a virtual sequencer to coordinate multiple agents (multi-master interconnect).
